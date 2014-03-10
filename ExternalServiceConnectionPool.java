@@ -19,7 +19,7 @@ public abstract class ExternalServiceConnectionPool<T extends AutoCloseable> {
     private ConcurrentHashMap<T, TakeServiceInfo> infoMap = new ConcurrentHashMap<>();
 
     public ExternalServiceConnectionPool(int numberOfServices) {
-        this(numberOfServices, 5, TimeUnit.SECONDS);
+        this(numberOfServices, 30, TimeUnit.SECONDS);
     }
 
 
@@ -31,7 +31,7 @@ public abstract class ExternalServiceConnectionPool<T extends AutoCloseable> {
             theServices.add(theService);
         }
         milliesToWait = timeoutUnit.toMillis(timeout);
-        EXECUTOR_SERVICE.scheduleWithFixedDelay(new CleaningRunnable(), 0, 30, TimeUnit.SECONDS);
+        EXECUTOR_SERVICE.scheduleWithFixedDelay(new CleaningRunnable(), timeout, timeout, timeoutUnit);
     }
 
     protected abstract T initialValue();
