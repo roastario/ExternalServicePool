@@ -38,8 +38,11 @@ public abstract class ExternalServiceConnectionPool<T extends AutoCloseable> {
 
     public void releaseService(T service) {
         logger.info(Thread.currentThread() + " has released: " + service.toString());
-        if (infoMap.replace(service, TakeServiceInfo.AVAILABLE_SERVICE) != null) {
+        TakeServiceInfo info;
+        if ((info = infoMap.replace(service, TakeServiceInfo.AVAILABLE_SERVICE)) != null && info != TakeServiceInfo.ABANDON_SERVICE){
             theServices.offer(service);
+        }else{
+            infoMap.replace(service, TakeServiceInfo.AVAILABLE_SERVICE, TakeServiceInfo.ABANDON_SERVICE);
         }
     }
 
